@@ -102,8 +102,6 @@ enclosed by '"'
 lines terminated by '\n'
 ignore 1 rows;
 
--- select date_format(str_to_date(date, '%d-%m-%Y'), '%Y-%m-%d') as date from covid_deaths			### date_format(str_to_date(date, '%d-%m-%Y'), '%Y-%m-%d') displays the date in YYYY-MM-DD format. This concept is still not clear tho, gotta look into this
--- order by date;
 
 select * from covid_deaths;
 
@@ -116,21 +114,21 @@ where continent!=""
 order by location, date;
 
 
-## Total Cases vs Total Deaths
+-- Total Cases vs Total Deaths
 select location, date_format(str_to_date(date, '%d-%m-%Y'), '%Y-%m-%d') as date, total_cases, new_cases, total_deaths, (total_deaths/total_cases)*100 as death_rate
 from covid_deaths
 where continent!=""
 order by location, date;
 
 
-## Population vs Total Cases
+-- Population vs Total Cases
 select location, date_format(str_to_date(date, '%d-%m-%Y'), '%Y-%m-%d') as date, population, total_cases, (total_cases/population)*100 as percent_population_infected
 from covid_deaths
 where continent!=""
 order by location, date;
 
 
-## Highest Infection Rate compared to Population
+-- Highest Infection Rate compared to Population
 select location, population, max(total_cases) as highest_infection_count, max((total_cases/population)*100) as max_percent_population_infected
 from covid_deaths
 where continent!=""
@@ -138,7 +136,7 @@ group by location, population
 order by max_percent_population_infected desc;
 
 
-## Highest Death Count
+-- Highest Death Count
 select location, max(total_deaths) as max_death_count
 from covid_deaths
 where continent!=""
@@ -146,7 +144,7 @@ group by location
 order by max_death_count desc;
 
 
-## Highest Death Count with respect to Continents
+-- Highest Death Count with respect to Continents
 select continent, sum(new_deaths) as max_death_count
 from covid_deaths
 where continent!=""
@@ -154,7 +152,7 @@ group by continent
 order by max_death_count desc;
 
 
-## Cases and Deaths per day
+-- Cases and Deaths per day
 select date_format(str_to_date(date, '%d-%m-%Y'), '%Y-%m-%d') as date, sum(new_cases) as total_case_count, sum(new_deaths) as total_death_count, (sum(new_deaths)/sum(new_cases))*100 as death_percent
 from covid_deaths
 where continent!=""
@@ -162,20 +160,20 @@ group by date
 order by date;
 
 
-## Total cases and deaths across the world
+-- Total cases and deaths across the world
 select sum(new_cases) as total_case_count, sum(new_deaths) as total_death_count, (sum(new_deaths)/sum(new_cases))*100 as death_percent
 from covid_deaths
 where continent!="";
 
 
-## Vaccinations
+-- Vaccinations
 select cd.continent, cd.location, date_format(str_to_date(cd.date, '%d-%m-%Y'), '%Y-%m-%d') as date, cd.population, cv.new_vaccinations, sum(new_vaccinations) over (partition by cd.location order by cd.location, date_format(str_to_date(cd.date, '%d-%m-%Y'), '%Y-%m-%d')) as total_no_of_people_vaccinated
 from covid_deaths cd
 join covid_vaccinations cv on cd.location=cv.location and cd.date=cv.date
 where cd.continent!=""
 order by cd.location, date;
 
-## Total Vaccinations vs Population
+-- Total Vaccinations vs Population
 -- Using CTE (Common Table Expression)
 With vac_wrt_pop (continent, location, date, population, new_vaccinations, total_no_of_people_vaccinated)
 as
@@ -186,11 +184,11 @@ as
 	where cd.continent!=""
 )
 
-select *, (total_no_of_people_vaccinated/population)*100 as vaccinated_population_percent			# The values are going over 100% because in the 'new_vaccinations' table 2nd dosage is also being considered
+select *, (total_no_of_people_vaccinated/population)*100 as vaccinated_population_percent			-- The values are going over 100% because in the 'new_vaccinations' table 2nd dosage is also being considered
 from vac_wrt_pop
 order by location, date;
 
-### Creating some VIEWS
+--- Creating some VIEWS
 
 create view TotalCasesVsTotalDeaths as
 select location, date_format(str_to_date(date, '%d-%m-%Y'), '%Y-%m-%d') as date, total_cases, new_cases, total_deaths, (total_deaths/total_cases)*100 as death_rate
