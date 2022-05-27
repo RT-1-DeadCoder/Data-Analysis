@@ -1,3 +1,5 @@
+-- Data Exploration of COVID-19 dataset
+
 create schema covid;
 
 use covid;
