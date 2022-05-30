@@ -1,3 +1,7 @@
+-- Data Cleaning of 'Nashville Housing' dataset
+
+
+
 create schema housing;
 
 use housing;
@@ -41,7 +45,7 @@ select * from nashville_housing_data
 order by parcel_id;
 
 
-## Fixing the date format
+-- Fixing the date format
 
 select sale_date, date_format(str_to_date(sale_date, '%M %d, %Y'), '%Y-%m-%d') as sale_date
 from nashville_housing_data;
@@ -49,7 +53,7 @@ from nashville_housing_data;
 update nashville_housing_data set sale_date= date_format(str_to_date(sale_date, '%M %d, %Y'), '%Y-%m-%d');
 
 
-## Populating the Property Address column
+-- Populating the Property Address column
 
 select property_address from nashville_housing_data;
 
@@ -71,7 +75,7 @@ WHERE
     a.property_address = '';
 
 
-## Spliting 'property_address' and 'owner_address'
+-- Spliting 'property_address' and 'owner_address'
 
 select substring(property_address, 1, position(',' in property_address)- 1) as address
 from nashville_housing_data;
@@ -114,7 +118,7 @@ add column owner_state varchar(100);
 update nashville_housing_data set owner_state= substring_index(owner_address, ',', -1);
 
 
-## Replacing "Y" and "N" with "Yes" and "No" respectively in 'sold_as_vacant'
+-- Replacing "Y" and "N" with "Yes" and "No" respectively in 'sold_as_vacant'
 
 select sold_as_vacant, count(sold_as_vacant)
 from nashville_housing_data
@@ -129,7 +133,7 @@ update nashville_housing_data set sold_as_vacant=
     end;
 
     
-## Removing Duplicates
+-- Removing Duplicates
 
 with dups as(
 	select *, row_number() over(
@@ -151,7 +155,7 @@ where dup > 1;
 -- order by parcel_id;
 
 
-## Delete unnecessary columns
+-- Delete unnecessary columns
 
 alter table nashville_housing_data
 drop column property_address;
